@@ -87,6 +87,8 @@ ParaParser-Editor/
 
 ## Usage
 
+<img width="1350" height="938" alt="ParaParser-Editor" src="https://github.com/user-attachments/assets/3f37c19b-cbe7-4907-ab83-9a288b654e88" />
+
 ### Opening a library
 
 1. **File → Library — Import** (`Ctrl+L`) — select a Qualcomm shared library (`.so` or proprietary binary).  
