@@ -23,7 +23,7 @@ ParaParser Editor is a PyQt5-based desktop application that lets you open a Qual
 - **Magisk module export** — wrap the modified library as a ready-to-flash Magisk module.
 - **ADB export** — push the modified library directly to a connected Android device.
 - **Hex viewer & hex editor** — inspect any parameter's raw bytes or edit them in-place (`Ctrl+D` / `Ctrl+Shift+D`).
-- **Checksum utility** — CRC-16 / ones-complement checksum helpers, with atomic file writes.
+- **Checksum utility** — CRC-32 / ones-complement checksum helpers, with atomic file writes.
 - **Find dialog** — search parameters by name or by hex pattern inside the file.
 - **Sorting** — display parameters as-parsed, by ID, or by offset.
 - **Plugin system**
