@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 FIGURE_SPACE = '\u2007'  # U+2007
-QTIDictionaryCreatorVer = "0.5"
+QTIDictionaryCreatorVer = "0.6"
 
 # ---- Globals for run() ----
 QTISelectedID = ""
@@ -29,9 +29,9 @@ QTISelectedLength = 0
 QTISelectedVersion = ""
 
 # ---------------------- helpers ----------------------
-TYPE_SIZES = {"u8": 1, "u16": 2, "f32": 4, "ascii": 1}
-ALLOWED_TYPES = ("u8", "u16", "f32", "ascii")
-TYPE_ORDER = {"u8": 0, "u16": 1, "f32": 2, "ascii": 3}
+TYPE_SIZES = {"u8": 1, "u16": 2, "u32": 4, "f32": 4, "ascii": 1}
+ALLOWED_TYPES = ("u8", "u16", "u32", "f32", "ascii")
+TYPE_ORDER = {"u8": 0, "u16": 1, "u32": 2, "f32": 3, "ascii": 4}
 
 
 class BookmarkDialog(QDialog):
@@ -59,9 +59,8 @@ class BookmarkDialog(QDialog):
         if self._length % 2 == 0:
             options.append("u16")
         if self._length % 4 == 0:
+            options.append("u32")
             options.append("f32")
-        if self._ascii_ok:
-            options.append("ascii")
 
         start_type = default_type if default_type in options else ("ascii" if ("ascii" in options and self._ascii_ok) else options[0])
         for t in options:
@@ -485,20 +484,29 @@ class HexDictionaryViewer(QMainWindow):
         if n == 2:
             return f"u16: {int.from_bytes(buf,'little')}, ASCII: '{self._ascii_str(buf)}'"
         if n == 4:
-            return f"float32: {self._fmt_float(struct.unpack('<f', buf)[0])}, ASCII: '{self._ascii_str(buf)}'"
+            u32_val = int.from_bytes(buf, "little")
+            f32_val = self._fmt_float(struct.unpack("<f", buf)[0])
+            return f"u32: {u32_val}, float32: {f32_val}, ASCII: '{self._ascii_str(buf)}'"
         MAX_SHOW = 64
         u8_seq = [str(b) for b in buf[:MAX_SHOW]] + (["…"] if len(buf) > MAX_SHOW else [])
         u16_seq, f32_seq = [], []
+        u32_seq = []        
         for i in range(0, n - n % 2, 2):
             if len(u16_seq) >= MAX_SHOW: u16_seq.append("…"); break
             u16_seq.append(str(int.from_bytes(buf[i:i+2], "little")))
         for i in range(0, n - n % 4, 4):
+            if len(u32_seq) >= MAX_SHOW: u32_seq.append("…"); break
+            u32_seq.append(str(int.from_bytes(buf[i:i+4], "little")))            
+        for i in range(0, n - n % 4, 4):
             if len(f32_seq) >= MAX_SHOW: f32_seq.append("…"); break
             f32_seq.append(self._fmt_float(struct.unpack("<f", buf[i:i+4])[0]))
         asc = self._ascii_str(buf)
+
+        
         parts = [
             "u8: " + ", ".join(u8_seq) if u8_seq else None,
             "u16: " + ", ".join(u16_seq) if u16_seq else None,
+            "u32: " + ", ".join(u32_seq) if u32_seq else None,
             "float32: " + ", ".join(f32_seq) if f32_seq else None,
             "ASCII: '" + asc + "'"
         ]
@@ -670,6 +678,11 @@ class HexDictionaryViewer(QMainWindow):
                 vals = []
                 for i in range(0, len(buf) - len(buf) % 2, 2):
                     vals.append(str(int.from_bytes(buf[i:i+2], "little")))
+                f_lines.append(f"{label} = " + ", ".join(vals))
+            elif typ == "u32":
+                vals = []
+                for i in range(0, len(buf) - len(buf) % 4, 4):
+                    vals.append(str(int.from_bytes(buf[i:i+4], "little")))
                 f_lines.append(f"{label} = " + ", ".join(vals))
             elif typ == "f32":
                 vals = []
