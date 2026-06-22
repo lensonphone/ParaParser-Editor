@@ -1,4 +1,3 @@
-# support.py
 import sys
 import base64
 import webbrowser
@@ -15,9 +14,12 @@ from PyQt5.QtGui import QImage, QPixmap
 import qrcode
 
 # ──────────────────────────────────────────────────────────────────────────────
-A93FEE5AAA3F38F8 = "567enA93FEE5AAA3F38F85infw34lincwA93FEE5AAA3F38F84l5vy8n6l45A93FEE5AAA3F38F8vmw"
+B3458C37AFAEFDFAB43CA = "v23n45p2m34cpm!!2mp834mp5mp347v5mp3452p3487n52cpv348m52348n5"
 
-def decrypt_link(enc_b64, key=A93FEE5AAA3F38F8):
+
+
+
+def decrypt_link(enc_b64, key=B3458C37AFAEFDFAB43CA):
     try:
         raw = base64.b64decode(enc_b64)
         out_bytes = bytes((b ^ ord(key[i % len(key)])) for i, b in enumerate(raw))
@@ -134,40 +136,28 @@ class SupportWindow(QDialog):
 
         # Encrypted links
         ENCRYPTED = {
-            "cnq3ytnl": b"XUJDFR17FhwxMjIbMSA1QSNcVmhbWgRBChJdRwMHHgsYL1wcKyAoVyQzMlsvQw==",  # Patreon
-            "9me5d6innt6": b"XUJDFR17FhwxMjIbMSA4QydfFiVXWEYKCRlSQAlWDBYEKFdWNTZ4UCU2IEEiVF0pVl0YTDYeVQ9fABpWLlQ=",  # PayPal
-            "45nbdbd6r7be6ubve65bu": b"V19DBgEoVwkkJnREc3QzWzBKXyhTDQpeEgdHQgcZAAIOIlwAc3E2UzsqNwAwAwtwT01TWBMKSw9RCQlxLldSMiBl",  # Bitcoin
+            "cn014bm10934nv": b"HkZHHkcPXx0aRENNAAxYUVMBXltcWUIUWgMRR1EIFEAeGV1RRkFNVlBPVhxRVQYfGFpAQS1SX1JdVEBWGV8=",  # PayPal
+            "3457mnnq2bnv4577": b"FFtHDVtcHggPUAUSQlhTSUQUF1ZYDA5AQR0ERV9HGFQUE1YHAAYDVU5TQV1DAlBGAUoLVQhGQVJTXVNxGVxSGlE=",  # Bitcoin
         }
 
         def get_final_url(name):
             return decrypt_link(ENCRYPTED.get(name, b""))
 
-        # ── Patreon row: [Support via Patreon]  [QR Code]
-        #patreon_row = QHBoxLayout()
-        #patreon_btn = QPushButton("Support via Patreon")
-        #patreon_btn.clicked.connect(lambda: open_url_crossplatform(get_final_url("cnq3ytnl")))
-        #patreon_row.addWidget(patreon_btn)
-
-        #patreon_qr_btn = QPushButton("QR Code")
-        #patreon_qr_btn.setFixedWidth(90)
-        #patreon_qr_btn.clicked.connect(lambda: show_qr_dialog(get_final_url("cnq3ytnl"), "Patreon QR"))
-        #patreon_row.addWidget(patreon_qr_btn)
-        #layout.addLayout(patreon_row)
 
         # ── PayPal row: [Donate via PayPal]  [QR Code]
         paypal_row = QHBoxLayout()
         paypal_btn = QPushButton("Donate via PayPal")
-        paypal_btn.clicked.connect(lambda: open_url_crossplatform(get_final_url("9me5d6innt6")))
+        paypal_btn.clicked.connect(lambda: open_url_crossplatform(get_final_url("cn014bm10934nv")))
         paypal_row.addWidget(paypal_btn)
 
         paypal_qr_btn = QPushButton("QR Code")
         paypal_qr_btn.setFixedWidth(90)
-        paypal_qr_btn.clicked.connect(lambda: show_qr_dialog(get_final_url("9me5d6innt6"), "PayPal QR"))
+        paypal_qr_btn.clicked.connect(lambda: show_qr_dialog(get_final_url("cn014bm10934nv"), "PayPal QR"))
         paypal_row.addWidget(paypal_qr_btn)
         layout.addLayout(paypal_row)
 
         # ── Bitcoin row:  "Bitcoin (BTC)"  [readonly address]  [QR Code]
-        bitcoin_url = get_final_url("45nbdbd6r7be6ubve65bu")
+        bitcoin_url = get_final_url("3457mnnq2bnv4577")
 
         btc_row = QHBoxLayout()
         btc_row.setContentsMargins(0, 0, 0, 0)
