@@ -1,3 +1,4 @@
+# support.py
 import sys
 import base64
 import webbrowser
@@ -14,12 +15,9 @@ from PyQt5.QtGui import QImage, QPixmap
 import qrcode
 
 # ──────────────────────────────────────────────────────────────────────────────
-B3458C37AFAEFDFAB43CA = "v23n45p2m34cpm!!2mp834mp5mp347v5mp3452p3487n52cpv348m52348n5"
+A93FEE5AAA3F38F8 = "v23n45p2m34cpm!!2mp834mp5mp347v5mp3452p3487n52cpv348m5"
 
-
-
-
-def decrypt_link(enc_b64, key=B3458C37AFAEFDFAB43CA):
+def decrypt_link(enc_b64, key=A93FEE5AAA3F38F8):
     try:
         raw = base64.b64decode(enc_b64)
         out_bytes = bytes((b ^ ord(key[i % len(key)])) for i, b in enumerate(raw))
@@ -55,7 +53,7 @@ def qr_qpixmap(data: str, size: int = 320) -> QPixmap:
         return QPixmap()
     try:
 
-        # True/False matrix
+        # матрица True/False
         qr = qrcode.QRCode(
             version=None,
             error_correction=qrcode.constants.ERROR_CORRECT_M,
@@ -70,7 +68,7 @@ def qr_qpixmap(data: str, size: int = 320) -> QPixmap:
         if not w or not h:
             return QPixmap()
 
-        # Draw RGB32 and then scale (no anti-aliasing)
+        # Рисуем RGB32 и затем масштабируем (без сглаживания)
         img = QImage(w, h, QImage.Format_RGB32)
         white = 0xFFFFFFFF
         black = 0xFF000000
@@ -136,52 +134,25 @@ class SupportWindow(QDialog):
 
         # Encrypted links
         ENCRYPTED = {
-            "cn014bm10934nv": b"HkZHHkcPXx0aRENNAAxYUVMBXltcWUIUWgMRR1EIFEAeGV1RRkFNVlBPVhxRVQYfGFpAQS1SX1JdVEBWGV8=",  # PayPal
-            "3457mnnq2bnv4577": b"FFtHDVtcHggPUAUSQlhTSUQUF1ZYDA5AQR0ERV9HGFQUE1YHAAYDVU5TQV1DAlBGAUoLVQhGQVJTXVNxGVxSGlE=",  # Bitcoin
+            "345m9wityo87": b"HkZHHkcPXx0HVlgPHwNIVUtDE1deGwkfWwwEVhs=",  # Externallink
         }
 
         def get_final_url(name):
             return decrypt_link(ENCRYPTED.get(name, b""))
 
+        # ── Jellonity row: [Support via Jellonity]  [QR Code]
+        weblink_row = QHBoxLayout()
+        weblink_btn = QPushButton("Open our donation link:")
+        weblink_btn.clicked.connect(lambda: open_url_crossplatform(get_final_url("345m9wityo87")))
+        weblink_row.addWidget(weblink_btn)
 
-        # ── PayPal row: [Donate via PayPal]  [QR Code]
-        paypal_row = QHBoxLayout()
-        paypal_btn = QPushButton("Donate via PayPal")
-        paypal_btn.clicked.connect(lambda: open_url_crossplatform(get_final_url("cn014bm10934nv")))
-        paypal_row.addWidget(paypal_btn)
+        weblink_qr_btn = QPushButton("QR Code")
+        weblink_qr_btn.setFixedWidth(90)
+        weblink_qr_btn.clicked.connect(lambda: show_qr_dialog(get_final_url("345m9wityo87"), "Jellonity QR"))
+        weblink_row.addWidget(weblink_qr_btn)
+        layout.addLayout(weblink_row)
 
-        paypal_qr_btn = QPushButton("QR Code")
-        paypal_qr_btn.setFixedWidth(90)
-        paypal_qr_btn.clicked.connect(lambda: show_qr_dialog(get_final_url("cn014bm10934nv"), "PayPal QR"))
-        paypal_row.addWidget(paypal_qr_btn)
-        layout.addLayout(paypal_row)
-
-        # ── Bitcoin row:  "Bitcoin (BTC)"  [readonly address]  [QR Code]
-        bitcoin_url = get_final_url("3457mnnq2bnv4577")
-
-        btc_row = QHBoxLayout()
-        btc_row.setContentsMargins(0, 0, 0, 0)
-        btc_row.setSpacing(8)
-
-        btc_label = QLabel("Bitcoin (BTC)")
-        btc_row.addWidget(btc_label)
-
-        btc_line = QLineEdit()
-        btc_line.setReadOnly(True) # can be selected and copied
-        btc_line.setFrame(False) # no frame
-        btc_line.setText(bitcoin_url or "")
-        btc_line.setCursorPosition(0)
-        # remove setFocusPolicy(Qt.NoFocus)
-        btc_line.setStyleSheet("QLineEdit { border: none; background: transparent; }")
-        btc_row.addWidget(btc_line, 1)
-
-        btc_qr_btn = QPushButton("QR Code")
-        btc_qr_btn.setFixedWidth(90)
-        btc_qr_btn.clicked.connect(lambda: show_qr_dialog(bitcoin_url, "Bitcoin QR"))
-        btc_row.addWidget(btc_qr_btn)
-
-        layout.addLayout(btc_row)
-
+ 
 
         # ── Close
         close_btn = QPushButton("Close")
